@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Controllers;
+
+use CodeIgniter\Controller;
+
+class Keamanan extends Controller
+{
+    public function index()
+    {
+        // Load the settings page view
+        return view('/user/keamanan');
+
+    }
+}
