@@ -57,7 +57,7 @@
     </a>
     <nav>
         <div class="mt-auto">
-            <a href="<?= site_url('admin/logout'); ?>" 
+            <a href="<?= site_url('/auth/logout'); ?>" 
                 class="btn-logout" 
                 onclick="return confirm('Apakah Anda yakin ingin keluar?');">
                 <i class="fas fa-sign-out-alt" style="font-size: 24px; padding-right: 10px"></i>
