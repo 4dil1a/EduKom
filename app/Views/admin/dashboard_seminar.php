@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .card:hover {
@@ -41,26 +42,6 @@
         
         table tr:hover {
             background-color: #f9fafb;
-        }
-
-        .alert {
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-        }
-
-        .alert-success {
-            background-color: #dcfce7;
-            color: #166534;
-            border: 1px solid #86efac;
-        }
-
-        .alert-error {
-            background-color: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fca5a5;
         }
     </style>
 </head>
@@ -135,21 +116,6 @@
             <h2 class="text-[24px] font-bold" style="color: #176B87;">Aktivitas Terbaru</h2>
         </div>
 
-        <!-- Notifications Section - Moved here -->
-        <?php if (session()->has('success')): ?>
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle mr-2"></i>
-                <?= session()->getFlashdata('success') ?>
-            </div>
-        <?php endif; ?>
-
-        <?php if (session()->has('error')): ?>
-            <div class="alert alert-error">
-                <i class="fas fa-exclamation-circle mr-2"></i>
-                <?= session()->getFlashdata('error') ?>
-            </div>
-        <?php endif; ?>
-
         <div class="bg-white rounded-lg shadow p-6">
             <!-- Tabs Section -->
             <div class="flex border-b mb-4">
@@ -199,9 +165,9 @@
                                    class="bg-[#176B87] text-white btn-small rounded text-center inline-flex items-center">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-                                <a href="<?= site_url('admin/hapusSeminar/' . $seminar['seminar_id'] . '?from=dashboard_seminar') ?>" 
+                                <a href="#" 
                                    class="bg-red-500 text-white btn-small rounded text-center inline-flex items-center"
-                                   onclick="return confirm('Yakin ingin menghapus seminar ini?')">
+                                   onclick="confirmDeletion(<?= $seminar['seminar_id']; ?>)">
                                     <i class="fas fa-trash"></i> Hapus
                                 </a>
                             </td>
@@ -218,5 +184,70 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Function to show SweetAlert success message
+        function showSuccessMessage(message) {
+            Swal.fire({
+                title: 'Berhasil!',
+                text: message,
+                icon: 'success',
+                confirmButtonColor: '#176B87',
+                customClass: {
+                    confirmButton: 'py-2 px-4 rounded-md'
+                }
+            });
+        }
+
+        // Function to show SweetAlert error message
+        function showErrorMessage(message) {
+            Swal.fire({
+                title: 'Error!',
+                text: message,
+                icon: 'error',
+                confirmButtonColor: '#DC2626',
+                customClass: {
+                    confirmButton: 'py-2 px-4 rounded-md text-white'
+                }
+            });
+        }
+
+        // Check for flash messages when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            <?php if(session()->getFlashdata('success')): ?>
+                showSuccessMessage('<?= session()->getFlashdata('success') ?>');
+            <?php endif; ?>
+
+            <?php if(session()->getFlashdata('error')): ?>
+                showErrorMessage('<?= session()->getFlashdata('error') ?>');
+            <?php endif; ?>
+        });
+
+        function confirmDeletion(id) {
+            Swal.fire({
+                title: 'Apakah anda yakin ingin menghapus seminar?',
+                text: '',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#E5F6FF',
+                cancelButtonColor: '#DC2626',
+                confirmButtonText: '<span style="color: #176B87;">Ya</span>',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    confirmButton: 'py-2 px-4 rounded-md',
+                    cancelButton: 'py-2 px-4 rounded-md text-white',
+                    popup: 'rounded-md small-popup',
+                    title: 'text-lg',
+                    content: 'text-sm'
+                },
+                width: '350px',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '<?= site_url('admin/hapusSeminar/') ?>' + id + '?from=dashboard_seminar';
+                }
+            });
+        }
+    </script>
+
 </body>
 </html>

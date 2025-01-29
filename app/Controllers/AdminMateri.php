@@ -118,6 +118,8 @@ class AdminMateri extends BaseController
     
     public function updateMateri($id)
     {
+        $referrer = $this->request->getGet('from') ?? 'materi';
+
         // Validasi input
         $validationRules = [
             'judul' => 'required|min_length[3]|max_length[255]',
@@ -209,9 +211,16 @@ class AdminMateri extends BaseController
     
         // Update data ke database
         $this->materiModel->update($id, $data);
-    
-        // Redirect dengan pesan sukses
-        return redirect()->to('/admin/materi')->with('success', 'Materi berhasil diperbarui');
+        
+        // Set flash message
+        session()->setFlashdata('success', 'Materi berhasil diperbarui');
+        
+        // Redirect based on referrer
+        if ($referrer === 'dashboard') {
+            return redirect()->to('/admin/dashboard')->with('success', 'Materi berhasil diperbarui');
+        } else {
+            return redirect()->to('/admin/materi')->with('success', 'Materi berhasil diperbarui');
+        }
     }
     
 
@@ -222,22 +231,35 @@ class AdminMateri extends BaseController
         $materi = $this->materiModel->find($id);
 
         if ($materi) {
+            // Hapus file-file terkait jika ada
+            if ($materi['gambar'] && file_exists(FCPATH . $materi['gambar'])) {
+                unlink(FCPATH . $materi['gambar']);
+            }
+            if ($materi['audio'] && file_exists(FCPATH . $materi['audio'])) {
+                unlink(FCPATH . $materi['audio']);
+            }
+            if ($materi['video'] && file_exists(FCPATH . $materi['video'])) {
+                unlink(FCPATH . $materi['video']);
+            }
+            if ($materi['unduh_materi'] && file_exists(FCPATH . $materi['unduh_materi'])) {
+                unlink(FCPATH . $materi['unduh_materi']);
+            }
+
             // Menghapus materi
             $this->materiModel->delete($id);
-
+            
+            // Set flash message
             session()->setFlashdata('success', 'Materi berhasil dihapus');
         } else {
             session()->setFlashdata('error', 'Materi tidak ditemukan');
         }
 
-        switch ($referrer) {
-            case 'dashboard':
-                return redirect()->to('/admin/dashboard');
-            case 'materi':
-                return redirect()->to('/admin/materi');
-            default:
-                return redirect()->to('/admin/materi');
-}
-}
+        // Redirect based on referrer
+        if ($referrer === 'dashboard') {
+            return redirect()->to('/admin/dashboard')->with('success', 'Materi berhasil dihapus');
+        } else {
+            return redirect()->to('/admin/materi')->with('success', 'Materi berhasil dihapus');
+        }
+    }
 
 }
