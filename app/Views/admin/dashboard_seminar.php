@@ -133,9 +133,6 @@
 
         <div class="flex justify-between items-center mb-5">
             <h2 class="text-[24px] font-bold" style="color: #176B87;">Aktivitas Terbaru</h2>
-            <a href="<?= site_url('admin/tambahSeminar?from=dashboard_seminar') ?>" class="bg-[#176B87] text-white px-4 py-2 rounded-lg hover:bg-[#0f4d61] transition">
-                <i class="fas fa-plus mr-2"></i>Tambah Seminar
-            </a>
         </div>
 
         <!-- Notifications Section - Moved here -->
@@ -193,7 +190,7 @@
                             <td class="border px-4 py-2 text-sm"><?= esc($seminar['penyelenggara']) ?></td>
                             <td class="border px-4 py-2 text-sm"><?= esc($seminar['tanggal']) ?></td>
                             <td class="border px-4 py-2 text-sm">
-                                <span class="<?= $seminar['status'] === 'published' ? 'text-green-600' : 'text-yellow-600' ?> px-2 py-1 rounded-full text-xs">
+                                <span class="<?= $seminar['status'] === 'published' ? 'text-[#176B87]' : 'text-[#44F12D]' ?>">
                                     <?= ucfirst($seminar['status']) ?>
                                 </span>
                             </td>
