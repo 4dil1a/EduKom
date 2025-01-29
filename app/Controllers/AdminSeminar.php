@@ -9,8 +9,10 @@ class AdminSeminar extends BaseController
     public function index()
     {
         $seminarModel = new SeminarModel();
-        // Ambil semua seminar termasuk tanggal
         $data['seminars'] = $seminarModel->getSeminars();
+        // Add flash message to view data
+        $data['message'] = session()->getFlashdata('message');
+        $data['success'] = session()->getFlashdata('success');
         return view('admin/seminar', $data);
     }
 
@@ -20,128 +22,141 @@ class AdminSeminar extends BaseController
     }
 
     public function simpanSeminar()
-{
-    $validation = \Config\Services::validation();
-    $file = $this->request->getFile('poster');
-
-     // Inisialisasi variabel path
-     $posterPath = null;
-     if ($this->request->getFile('poster')->isValid()) {
-         $poster = $this->request->getFile('poster');
-         $namaPoster = $poster->getRandomName();
-         $posterPath = 'uploads/gambar/' . $namaPoster;
-         $poster->move(FCPATH . 'uploads/gambar', $namaPoster);
-     }
-
-    // Simpan data seminar ke database, termasuk path file poster
-    $seminarModel = new SeminarModel();
-    $seminarModel->save([
-        'judul' => $this->request->getPost('judul'),
-        'deskripsi' => $this->request->getPost('deskripsi'),
-        'penyelenggara' => $this->request->getPost('penyelenggara'),
-        'bentuk_acara' => $this->request->getPost('bentuk_acara'),
-        'tanggal' => $this->request->getPost('tanggal'),
-        'jam' => $this->request->getPost('jam'),
-        'status' => $this->request->getPost('status'),
-        'poster' => $posterPath, // Menyimpan path file poster
-    ]);
-
-    return redirect()->to('/admin/seminar')->with('success', 'Seminar berhasil disimpan.');
-}
-
-
-
-public function editSeminar($seminar_id)
-{
-    // Ambil data seminar berdasarkan ID
-    $seminarModel = new SeminarModel();
-    $seminar = $seminarModel->find($seminar_id);
-    
-    // Jika seminar tidak ditemukan, arahkan ke halaman seminar
-    if (!$seminar) {
-        return redirect()->to('/admin/seminar')->with('error', 'Seminar tidak ditemukan');
-    }
-
-    // Kirim data seminar ke view
-    return view('admin/edit_seminar', ['seminar' => $seminar]);
-}
-
-
-public function updateSeminar($seminar_id)
-{
-    // Validasi input
-    if (!$this->validate([
-        'judul' => 'required',
-        'deskripsi' => 'required',
-        'penyelenggara' => 'required',
-        'bentuk_acara' => 'required',
-        'tanggal' => 'required',
-        'jam' => 'required', // Validasi untuk jam
-        'status' => 'required',
-    ])) {
-        return redirect()->to('/admin/editSeminar/' . $seminar_id)->withInput();
-    }
-
-    // Ambil data seminar yang akan diupdate
-    $seminarModel = new SeminarModel();
-    $seminar = $seminarModel->find($seminar_id);
-
-    // Perbarui data seminar
-    $data = [
-        'judul' => $this->request->getPost('judul'),
-        'deskripsi' => $this->request->getPost('deskripsi'),
-        'penyelenggara' => $this->request->getPost('penyelenggara'),
-        'bentuk_acara' => $this->request->getPost('bentuk_acara'),
-        'tanggal' => $this->request->getPost('tanggal'),
-        'jam' => $this->request->getPost('jam'), // Update field jam
-        'status' => $this->request->getPost('status'),
-    ];
-
-    // Jika ada file poster baru, upload dan perbarui
-    if ($this->request->getFile('poster')->isValid()) {
+    {
+        $validation = \Config\Services::validation();
         $file = $this->request->getFile('poster');
-        $newName = $file->getRandomName();
-        $file->move('uploads/posters', $newName);
 
-        // Tambahkan poster yang baru
-        $data['poster'] = 'uploads/posters/' . $newName;
-    }
+        // Inisialisasi variabel path
+        $posterPath = null;
+        if ($this->request->getFile('poster')->isValid()) {
+            $poster = $this->request->getFile('poster');
+            $namaPoster = $poster->getRandomName();
+            $posterPath = 'uploads/gambar/' . $namaPoster;
+            $poster->move(FCPATH . 'uploads/gambar', $namaPoster);
+        }
 
-    // Update data seminar di database
-    $seminarModel->update($seminar_id, $data);
+        // Simpan data seminar ke database
+        $seminarModel = new SeminarModel();
+        $seminarModel->save([
+            'judul' => $this->request->getPost('judul'),
+            'deskripsi' => $this->request->getPost('deskripsi'),
+            'penyelenggara' => $this->request->getPost('penyelenggara'),
+            'bentuk_acara' => $this->request->getPost('bentuk_acara'),
+            'tanggal' => $this->request->getPost('tanggal'),
+            'jam' => $this->request->getPost('jam'),
+            'status' => $this->request->getPost('status'),
+            'poster' => $posterPath,
+        ]);
 
-    // Redirect ke halaman seminar dengan pesan sukses
-    return redirect()->to('/admin/seminar')->with('success', 'Seminar berhasil diperbarui!');
-}
-
-public function hapusSeminar($seminar_id)
-{
-    $referrer = $this->request->getGet('from') ?? 'seminar';
-    $seminarModel = new \App\Models\SeminarModel();
-
-    // Cek apakah seminar dengan ID yang diberikan ada
-    $seminar = $seminarModel->find($seminar_id);
-    
-    if ($seminar) {
-        // Hapus seminar dari database
-        $seminarModel->delete($seminar_id);
+        // Get the referrer page
+        $referrer = $this->request->getGet('from') ?? 'seminar';
         
-        // Set flash message sukses
-        session()->setFlashdata('message', 'Seminar berhasil dihapus.');
-    } else {
-        // Set flash message error jika seminar tidak ditemukan
-        session()->setFlashdata('message', 'Seminar tidak ditemukan.');
+        // Set success message
+        session()->setFlashdata('success', 'Seminar berhasil disimpan.');
+        
+        // Redirect based on referrer
+        return $this->redirectWithReferrer($referrer);
     }
 
-    switch ($referrer) {
-        case 'dashboard_seminar':
-            return redirect()->to('/admin/dashboard_seminar');
-        case 'seminar':
-            return redirect()->to('/admin/seminar');
-        default:
-            return redirect()->to('/admin/seminar');
-}
+    public function editSeminar($seminar_id)
+    {
+        $seminarModel = new SeminarModel();
+        $seminar = $seminarModel->find($seminar_id);
+        
+        if (!$seminar) {
+            session()->setFlashdata('error', 'Seminar tidak ditemukan');
+            return $this->redirectWithReferrer($this->request->getGet('from'));
+        }
 
+        $data = [
+            'seminar' => $seminar,
+            'from' => $this->request->getGet('from') ?? 'seminar'
+        ];
+
+        return view('admin/edit_seminar', $data);
     }
-    
+
+    public function updateSeminar($seminar_id)
+    {
+        // Get the referrer page
+        $referrer = $this->request->getPost('from') ?? 'seminar';
+
+        // Validasi input
+        if (!$this->validate([
+            'judul' => 'required',
+            'deskripsi' => 'required',
+            'penyelenggara' => 'required',
+            'bentuk_acara' => 'required',
+            'tanggal' => 'required',
+            'jam' => 'required',
+            'status' => 'required',
+        ])) {
+            return redirect()->to('/admin/editSeminar/' . $seminar_id . '?from=' . $referrer)->withInput();
+        }
+
+        $seminarModel = new SeminarModel();
+        $seminar = $seminarModel->find($seminar_id);
+
+        if (!$seminar) {
+            session()->setFlashdata('error', 'Seminar tidak ditemukan');
+            return $this->redirectWithReferrer($referrer);
+        }
+
+        $data = [
+            'judul' => $this->request->getPost('judul'),
+            'deskripsi' => $this->request->getPost('deskripsi'),
+            'penyelenggara' => $this->request->getPost('penyelenggara'),
+            'bentuk_acara' => $this->request->getPost('bentuk_acara'),
+            'tanggal' => $this->request->getPost('tanggal'),
+            'jam' => $this->request->getPost('jam'),
+            'status' => $this->request->getPost('status'),
+        ];
+
+        // Handle poster upload
+        if ($this->request->getFile('poster')->isValid()) {
+            $file = $this->request->getFile('poster');
+            $newName = $file->getRandomName();
+            $file->move('uploads/posters', $newName);
+            $data['poster'] = 'uploads/posters/' . $newName;
+        }
+
+        // Update seminar
+        $seminarModel->update($seminar_id, $data);
+        
+        // Set success message
+        session()->setFlashdata('success', 'Seminar berhasil diperbarui!');
+        
+        // Redirect based on referrer
+        return $this->redirectWithReferrer($referrer);
+    }
+
+    public function hapusSeminar($seminar_id)
+    {
+        $referrer = $this->request->getGet('from') ?? 'seminar';
+        $seminarModel = new SeminarModel();
+
+        $seminar = $seminarModel->find($seminar_id);
+        
+        if ($seminar) {
+            $seminarModel->delete($seminar_id);
+            session()->setFlashdata('success', 'Seminar berhasil dihapus.');
+        } else {
+            session()->setFlashdata('error', 'Seminar tidak ditemukan.');
+        }
+
+        return $this->redirectWithReferrer($referrer);
+    }
+
+    // Helper method to handle redirects
+    private function redirectWithReferrer($referrer)
+    {
+        switch ($referrer) {
+            case 'dashboard_seminar':
+                return redirect()->to('/admin/dashboard_seminar');
+            case 'seminar':
+                return redirect()->to('/admin/seminar');
+            default:
+                return redirect()->to('/admin/seminar');
+        }
+    }
 }
