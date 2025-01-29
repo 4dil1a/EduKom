@@ -42,6 +42,92 @@
                 field.classList.remove('border-red-500');
             });
         }
+
+        // Time picker functionality
+        function initTimePicker() {
+            const timeInput = document.getElementById('jam');
+            const timeDropdown = document.getElementById('timeDropdown');
+            let selectedHour = '10';
+            let selectedMinute = '00';
+            let selectedPeriod = 'AM';
+
+            // Create time options
+            function createTimeOptions() {
+                const hours = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
+                const minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
+                const periods = ['AM', 'PM'];
+
+                const hoursHtml = hours.map(hour => `
+                    <div class="time-option hour-option px-4 py-1 text-xs cursor-pointer hover:bg-blue-50" data-value="${hour}">
+                        ${hour}
+                    </div>
+                `).join('');
+
+                const minutesHtml = minutes.map(minute => `
+                    <div class="time-option minute-option px-4 py-1 text-xs cursor-pointer hover:bg-blue-50" data-value="${minute}">
+                        ${minute}
+                    </div>
+                `).join('');
+
+                const periodsHtml = periods.map(period => `
+                    <div class="time-option period-option px-4 py-1 text-xs cursor-pointer hover:bg-blue-50" data-value="${period}">
+                        ${period}
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="grid grid-cols-3 gap-0 w-[200px] bg-white border rounded-xl shadow-lg">
+                        <div class="max-h-48 overflow-y-auto border-r">${hoursHtml}</div>
+                        <div class="max-h-48 overflow-y-auto border-r">${minutesHtml}</div>
+                        <div>${periodsHtml}</div>
+                    </div>
+                `;
+            }
+
+            // Toggle dropdown
+            timeInput.addEventListener('click', (e) => {
+                e.stopPropagation();
+                timeDropdown.innerHTML = createTimeOptions();
+                timeDropdown.style.display = timeDropdown.style.display === 'none' ? 'block' : 'none';
+            });
+
+            // Handle option selection
+            timeDropdown.addEventListener('click', (e) => {
+                const option = e.target.closest('.time-option');
+                if (!option) return;
+
+                if (option.classList.contains('hour-option')) {
+                    selectedHour = option.dataset.value;
+                } else if (option.classList.contains('minute-option')) {
+                    selectedMinute = option.dataset.value;
+                } else if (option.classList.contains('period-option')) {
+                    selectedPeriod = option.dataset.value;
+                }
+
+                timeInput.value = `${selectedHour}:${selectedMinute} ${selectedPeriod}`;
+                highlightSelected();
+            });
+
+            // Highlight selected options
+            function highlightSelected() {
+                document.querySelectorAll('.time-option').forEach(option => {
+                    if ((option.classList.contains('hour-option') && option.dataset.value === selectedHour) ||
+                        (option.classList.contains('minute-option') && option.dataset.value === selectedMinute) ||
+                        (option.classList.contains('period-option') && option.dataset.value === selectedPeriod)) {
+                        option.classList.add('bg-blue-500', 'text-white');
+                    } else {
+                        option.classList.remove('bg-blue-500', 'text-white');
+                    }
+                });
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!timeInput.contains(e.target) && !timeDropdown.contains(e.target)) {
+                    timeDropdown.style.display = 'none';
+                }
+            });
+        }
     </script>
     <style>
         .btn-small {
@@ -68,13 +154,25 @@
             display: block;
         }
 
-        /* Add smaller text size for input values */
         .input-small {
-            font-size: 0.875rem; /* 14px */
+            font-size: 0.875rem;
+        }
+
+        /* Time picker specific styles */
+        .time-picker-dropdown {
+            display: none;
+            position: absolute;
+            z-index: 50;
+            margin-top: 4px;
+            width: 200px;
+        }
+
+        .time-option:hover {
+            background-color: #EBF5FF;
         }
     </style>
 </head>
-<body class="bg-[#EEF5FF] h-screen flex">
+<body class="bg-[#EEF5FF] h-screen flex" onload="initTimePicker()">
 
     <!-- Sidebar -->
     <?php include 'sidebar.php'; ?>
@@ -122,9 +220,11 @@
                             <input type="date" id="tanggal" name="tanggal" class="input-small mt-1 p-2 w-full border border-gray-300 rounded" value="<?= old('tanggal') ?>" required>
                             <div class="text-red-500 text-sm"><?= \Config\Services::validation()->getError('tanggal') ?></div>
                         </div>
-                        <div class="mt-4">
+
+                        <div class="mt-4 relative">
                             <label for="jam" class="block text-sm font-medium text-gray-700">Jam</label>
-                            <input type="time" id="jam" name="jam" class="input-small mt-1 p-2 w-full border border-gray-300 rounded" value="<?= old('jam') ?>" required>
+                            <input type="text" id="jam" name="jam" class="input-small mt-1 p-2 w-full border border-gray-300 rounded-xl cursor-pointer bg-white" value="<?= old('jam') ?>" required readonly>
+                            <div id="timeDropdown" class="time-picker-dropdown"></div>
                             <div class="text-red-500 text-sm"><?= \Config\Services::validation()->getError('jam') ?></div>
                         </div>
 
@@ -177,34 +277,5 @@
             </form>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const dropdown = document.querySelector('.dropdown');
-            const dropdownContent = document.querySelector('.dropdown-content');
-            let timer;
-
-            dropdown.addEventListener('mouseenter', () => {
-                dropdownContent.style.display = 'block';
-                clearTimeout(timer);
-            });
-
-            dropdownContent.addEventListener('mouseenter', () => {
-                clearTimeout(timer);
-            });
-
-            dropdown.addEventListener('mouseleave', () => {
-                timer = setTimeout(() => {
-                    dropdownContent.style.display = 'none';
-                }, 30000);
-            });
-
-            dropdownContent.addEventListener('mouseleave', () => {
-                timer = setTimeout(() => {
-                    dropdownContent.style.display = 'none';
-                }, 30000);
-            });
-        });
-    </script>
 </body>
 </html>
