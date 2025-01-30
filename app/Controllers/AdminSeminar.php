@@ -77,86 +77,60 @@ class AdminSeminar extends BaseController
     }
 
     public function updateSeminar($seminar_id)
-    {
-        // Get the referrer page
-        $referrer = $this->request->getPost('from') ?? 'seminar';
+{
+    // Get the referrer from the URL parameter
+    $referrer = $this->request->getGet('from') ?? 'seminar';
 
-        // Validasi input
-        if (!$this->validate([
-            'judul' => 'required',
-            'deskripsi' => 'required',
-            'penyelenggara' => 'required',
-            'bentuk_acara' => 'required',
-            'tanggal' => 'required',
-            'jam' => 'required',
-            'status' => 'required',
-        ])) {
-            return redirect()->to('/admin/editSeminar/' . $seminar_id . '?from=' . $referrer)->withInput();
-        }
+    // Validasi input
+    if (!$this->validate([
+        'judul' => 'required',
+        'deskripsi' => 'required',
+        'penyelenggara' => 'required',
+        'bentuk_acara' => 'required',
+        'tanggal' => 'required',
+        'jam' => 'required',
+        'status' => 'required',
+    ])) {
+        return redirect()->to('/admin/editSeminar/' . $seminar_id . '?from=' . $referrer)->withInput();
+    }
 
-        $seminarModel = new SeminarModel();
-        $seminar = $seminarModel->find($seminar_id);
+    $seminarModel = new SeminarModel();
+    $seminar = $seminarModel->find($seminar_id);
 
-        if (!$seminar) {
-            session()->setFlashdata('error', 'Seminar tidak ditemukan');
-            return $this->redirectWithReferrer($referrer);
-        }
-
-        $data = [
-            'judul' => $this->request->getPost('judul'),
-            'deskripsi' => $this->request->getPost('deskripsi'),
-            'penyelenggara' => $this->request->getPost('penyelenggara'),
-            'bentuk_acara' => $this->request->getPost('bentuk_acara'),
-            'tanggal' => $this->request->getPost('tanggal'),
-            'jam' => $this->request->getPost('jam'),
-            'status' => $this->request->getPost('status'),
-        ];
-
-        // Handle poster upload
-        if ($this->request->getFile('poster')->isValid()) {
-            $file = $this->request->getFile('poster');
-            $newName = $file->getRandomName();
-            $file->move('uploads/posters', $newName);
-            $data['poster'] = 'uploads/posters/' . $newName;
-        }
-
-        // Update seminar
-        $seminarModel->update($seminar_id, $data);
-        
-        // Set success message
-        session()->setFlashdata('success', 'Seminar berhasil diperbarui!');
-        
-        // Redirect based on referrer
+    if (!$seminar) {
+        session()->setFlashdata('error', 'Seminar tidak ditemukan');
         return $this->redirectWithReferrer($referrer);
     }
 
-    public function hapusSeminar($seminar_id)
-    {
-        $referrer = $this->request->getGet('from') ?? 'seminar';
-        $seminarModel = new SeminarModel();
+    $data = [
+        'judul' => $this->request->getPost('judul'),
+        'deskripsi' => $this->request->getPost('deskripsi'),
+        'penyelenggara' => $this->request->getPost('penyelenggara'),
+        'bentuk_acara' => $this->request->getPost('bentuk_acara'),
+        'tanggal' => $this->request->getPost('tanggal'),
+        'jam' => $this->request->getPost('jam'),
+        'status' => $this->request->getPost('status'),
+    ];
 
-        $seminar = $seminarModel->find($seminar_id);
-        
-        if ($seminar) {
-            $seminarModel->delete($seminar_id);
-            session()->setFlashdata('success', 'Seminar berhasil dihapus.');
-        } else {
-            session()->setFlashdata('error', 'Seminar tidak ditemukan.');
-        }
-
-        return $this->redirectWithReferrer($referrer);
+    // Handle poster upload
+    if ($this->request->getFile('poster')->isValid()) {
+        $file = $this->request->getFile('poster');
+        $newName = $file->getRandomName();
+        $file->move('uploads/posters', $newName);
+        $data['poster'] = 'uploads/posters/' . $newName;
     }
 
-    // Helper method to handle redirects
-    private function redirectWithReferrer($referrer)
-    {
-        switch ($referrer) {
-            case 'dashboard_seminar':
-                return redirect()->to('/admin/dashboard_seminar');
-            case 'seminar':
-                return redirect()->to('/admin/seminar');
-            default:
-                return redirect()->to('/admin/seminar');
-        }
+    // Update seminar
+    $seminarModel->update($seminar_id, $data);
+    
+    // Set flash message
+    session()->setFlashdata('success', 'Seminar berhasil diperbarui');
+    
+    // Redirect based on referrer
+    if ($referrer === 'dashboard_seminar') {
+        return redirect()->to('/admin/dashboard_seminar')->with('success', 'Seminar berhasil diperbarui');
+    } else {
+        return redirect()->to('/admin/seminar')->with('success', 'Seminar berhasil diperbarui');
     }
+}
 }

@@ -7,27 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         function submitFormWithStatus(value) {
-            const form = document.getElementById('materiForm');
-            const statusInput = document.getElementById('status');
-            const requiredFields = form.querySelectorAll('[required]');
-
-            statusInput.value = value;
-
-            let isValid = true;
-            requiredFields.forEach(field => {
-                if (!field.value) {
-                    isValid = false;
-                    field.classList.add('border-red-500');
-                } else {
-                    field.classList.remove('border-red-500');
-                }
-            });
-
-            if (isValid) {
-                form.submit();
-            } else {
-                alert('Harap isi semua field yang diperlukan');
-            }
+            document.getElementById('status').value = value;
+            document.getElementById('materiForm').submit();
         }
 
         document.addEventListener('DOMContentLoaded', () => {

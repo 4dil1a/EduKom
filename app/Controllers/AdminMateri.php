@@ -222,12 +222,13 @@ class AdminMateri extends BaseController
             return redirect()->to('/admin/materi')->with('success', 'Materi berhasil diperbarui');
         }
     }
+
     
 
     public function hapusMateri($id)
     {
         $referrer = $this->request->getGet('from') ?? 'materi';
-
+        
         $materi = $this->materiModel->find($id);
 
         if ($materi) {

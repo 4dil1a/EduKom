@@ -111,9 +111,9 @@ class AdminKuis extends BaseController
         ]);
     }
 
-    public function updateKuis() 
+    public function updateKuis($kuisId) 
     {
-        $referrer = $this->request->getPost('referrer') ?? 'kuis';
+        $referrer = $this->request->getGet('from') ?? 'kuis';
         
         $kuisModel = new KuisModel();
         $questionModel = new QuestionModel();
@@ -171,15 +171,14 @@ class AdminKuis extends BaseController
             }
         }
 
-        return redirect()->to('/admin/' . $referrer)->with('success', 'Kuis berhasil diperbarui!');
-    }
-
-    public function deleteSoal($soalId)
-    {
-        $referrer = $this->request->getGet('from') ?? 'kuis';
-        $questionModel = new QuestionModel();
-        $questionModel->delete($soalId);
-        return redirect()->back()->with('success', 'Soal berhasil dihapus.');
+        // Redirect based on referrer
+        switch ($referrer) {
+            case 'dashboard_kuis':
+                return redirect()->to('/admin/dashboard_kuis')->with('success', 'Kuis berhasil diperbarui!');
+            case 'kuis':
+            default:
+                return redirect()->to('/admin/kuis')->with('success', 'Kuis berhasil diperbarui!');
+        }
     }
 
     public function delete($kuisId)
@@ -196,14 +195,22 @@ class AdminKuis extends BaseController
 
         $successMessage = 'Kuis beserta soal berhasil dihapus.';
         
-        // Redirect with success message based on referrer
+        // Redirect based on referrer
         switch ($referrer) {
             case 'dashboard_kuis':
                 return redirect()->to('/admin/dashboard_kuis')->with('success', $successMessage);
-            case 'seminar':
-                return redirect()->to('/admin/kuis')->with('success', $successMessage);
+            case 'kuis':
             default:
                 return redirect()->to('/admin/kuis')->with('success', $successMessage);
         }
     }
+    public function deleteSoal($soalId)
+    {
+        $referrer = $this->request->getGet('from') ?? 'kuis';
+        $questionModel = new QuestionModel();
+        $questionModel->delete($soalId);
+        return redirect()->back()->with('success', 'Soal berhasil dihapus.');
+    }
+
+    
 }

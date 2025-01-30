@@ -8,9 +8,9 @@
     <script>
         // Function to submit form with selected status
         function submitFormWithStatus(value) {
-            document.getElementById('status').value = value;
-            document.getElementById('seminarForm').submit();
-        }
+    document.getElementById('status').value = value;
+    document.getElementById('seminarForm').submit();
+}
 
         // Function to clear the form
         function clearForm() {
@@ -117,6 +117,35 @@
                 }
             });
         }
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropdown = document.querySelector('.dropdown');
+            const dropdownContent = document.querySelector('.dropdown-content');
+            let timer;
+
+            dropdown.addEventListener('mouseenter', () => {
+                dropdownContent.style.display = 'block';
+                clearTimeout(timer);
+            });
+
+            dropdownContent.addEventListener('mouseenter', () => {
+                clearTimeout(timer);
+            });
+
+            dropdown.addEventListener('mouseleave', () => {
+                timer = setTimeout(() => {
+                    dropdownContent.style.display = 'none';
+                }, 30000);
+            });
+
+            dropdownContent.addEventListener('mouseleave', () => {
+                timer = setTimeout(() => {
+                    dropdownContent.style.display = 'none';
+                }, 30000);
+            });
+
+            initializeTextEditor();
+        });
+
     </script>
     <style>
         .btn-small {
@@ -193,9 +222,7 @@
         
         <div class="bg-white rounded-lg shadow p-6 h-[760px]"> <!-- Increased from 640px to 760px -->
             <!-- Form Edit Seminar -->
-            <form id="seminarForm" action="<?= site_url('admin/updateSeminar/' . $seminar['seminar_id']) ?>" method="post" enctype="multipart/form-data">
-                <?= csrf_field() ?>
-                <input type="hidden" name="referrer" value="<?= $referrer ?>">
+            <form id="seminarForm" action="<?= site_url('admin/updateSeminar/' . $seminar['seminar_id'] . '?from=' . $referrer) ?>" method="post" enctype="multipart/form-data">
 
                 <!-- Layout Form -->
                 <div class="flex flex-wrap gap-6">

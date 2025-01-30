@@ -168,7 +168,7 @@
                 </table>
             </div>
             <div class="text-right mt-4">
-                <a href="<?= site_url('admin/kuis') ?>" class="text-[#176B87] text-sm">Lihat Semua >> </a>
+                <a href="<?= site_url('admin/kuis') ?>" class="text-[#176B87] text-sm">Lihat Semua <i class="fas fa-arrow-right ml-1"></i> </a>
             </div>
         </div>
     </div>

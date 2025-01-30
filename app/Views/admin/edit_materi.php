@@ -7,29 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
        function submitFormWithStatus(value) {
-            const form = document.getElementById('materiForm');
-            const statusInput = document.getElementById('status');
-            const requiredFields = form.querySelectorAll('[required]');
-
-            statusInput.value = value;
-
-            let isValid = true;
-            requiredFields.forEach(field => {
-                if (!field.value) {
-                    isValid = false;
-                    field.classList.add('border-red-500');
-                } else {
-                    field.classList.remove('border-red-500');
-                }
-            });
-
-            if (isValid) {
-                form.submit();
-            } else {
-                alert('Harap isi semua field yang diperlukan');
-            }
+            document.getElementById('status').value = value;
+            document.getElementById('materiForm').submit();
         }
-
+       
         document.addEventListener('DOMContentLoaded', () => {
             const dropdown = document.querySelector('.dropdown');
             const dropdownContent = document.querySelector('.dropdown-content');
@@ -195,7 +176,8 @@
             <h1 class="text-[24px] font-bold" style="color: #176B87;">Edit Materi</h1>
         </div>
         <div class="bg-white rounded-lg shadow p-6 h-[600px]">
-            <form id="materiForm" action="<?= site_url('admin/updateMateri/' . $materi['materi_id']) ?>" method="post" enctype="multipart/form-data">
+            <!-- Change this line in edit_materi.php -->
+            <form id="materiForm" action="<?= site_url('admin/updateMateri/' . $materi['materi_id'] . '?from=' . $referrer) ?>" method="post" enctype="multipart/form-data">
                 <?= csrf_field() ?>
 
                 <div class="flex flex-wrap gap-6">

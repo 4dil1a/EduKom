@@ -6,6 +6,40 @@
     <title>Edit Kuis</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+document.addEventListener('DOMContentLoaded', () => {
+            const dropdown = document.querySelector('.dropdown');
+            const dropdownContent = document.querySelector('.dropdown-content');
+            let timer;
+
+            dropdown.addEventListener('mouseenter', () => {
+                dropdownContent.style.display = 'block';
+                clearTimeout(timer);
+            });
+
+            dropdownContent.addEventListener('mouseenter', () => {
+                clearTimeout(timer);
+            });
+
+            dropdown.addEventListener('mouseleave', () => {
+                timer = setTimeout(() => {
+                    dropdownContent.style.display = 'none';
+                }, 30000);
+            });
+
+            dropdownContent.addEventListener('mouseleave', () => {
+                timer = setTimeout(() => {
+                    dropdownContent.style.display = 'none';
+                }, 30000);
+            });
+
+            initializeTextEditor();
+        });
+
+       function submitFormWithStatus(value) {
+            document.getElementById('status').value = value;
+            document.getElementById('kuisForm').submit();
+        }
+
         let jumlahSoal = <?= isset($soal) ? count($soal) : 0 ?>;
 
         function tambahPertanyaan() {
@@ -153,7 +187,7 @@
     <div class="flex-1 pl-[242px] px-8 py-8 pt-[90px] overflow-auto pb-[50px]">
         <div class="flex items-center gap-3 mb-3">
         <?php
-            $referrer = isset($_GET['from']) ? $_GET['from'] : (session()->get('referrer') ?? 'seminar');
+            $referrer = isset($_GET['from']) ? $_GET['from'] : (session()->get('referrer') ?? 'kuis');
             $backUrl = site_url('admin/' . $referrer);
         ?>
             <a href="<?= $backUrl ?>" class="text-[24px] text-gray-600 hover:text-gray-800 font-bold">
@@ -162,8 +196,9 @@
             <h1 class="text-[24px] font-bold" style="color: #176B87;">Edit Kuis</h1>
         </div>
         
-        <div class="bg-white rounded-lg shadow px-8 pt-[2px] pb-20"> <!-- Increased padding and added bottom margin -->
-            <form id="kuisForm" action="<?= site_url('admin/updateKuis/' . $kuis['kuis_id']) ?>" method="post" class="space-y-8"> <!-- Increased space between form elements -->
+        <div class="bg-white rounded-lg shadow px-8 pt-[2px] pb-20">
+            <form id="kuisForm" action="<?= site_url('admin/updateKuis/' . $kuis['kuis_id'] . '?from=' . $referrer) ?>" method="post" class="space-y-8">
+                <?= csrf_field() ?>
                 <input type="hidden" name="kuis_id" value="<?= $kuis['kuis_id'] ?>">
                 
                 <div>
@@ -246,40 +281,9 @@
                             class="px-4 py-2 text-sm text-white bg-red-500 rounded-md hover:bg-red-600 flex items-center gap-1">
                         Hapus
                     </button>
+                </div>
             </form>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const dropdown = document.querySelector('.dropdown');
-            const dropdownContent = document.querySelector('.dropdown-content');
-            let timer;
-
-            dropdown.addEventListener('mouseenter', () => {
-                dropdownContent.style.display = 'block';
-                clearTimeout(timer);
-            });
-
-            dropdownContent.addEventListener('mouseenter', () => {
-                clearTimeout(timer);
-            });
-
-            dropdown.addEventListener('mouseleave', () => {
-                timer = setTimeout(() => {
-                    dropdownContent.style.display = 'none';
-                }, 30000);
-            });
-
-            dropdownContent.addEventListener('mouseleave', () => {
-                timer = setTimeout(() => {
-                    dropdownContent.style.display = 'none';
-                }, 30000);
-            });
-
-            checkEmptyContainer();
-            updateQuestionNumbers();
-        });
-    </script>
 </body>
 </html>

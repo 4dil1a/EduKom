@@ -96,29 +96,9 @@
         }
 
         function submitFormWithStatus(value) {
-            const form = document.getElementById('kuisForm');
-            const statusInput = document.getElementById('status');
-            const requiredFields = form.querySelectorAll('[required]');
-            
-            statusInput.value = value;
-            
-            let isValid = true;
-            requiredFields.forEach(field => {
-                if (!field.value) {
-                    isValid = false;
-                    field.classList.add('border-red-500');
-                } else {
-                    field.classList.remove('border-red-500');
-                }
-            });
-            
-            if (isValid) {
-                form.submit();
-            } else {
-                alert('Harap isi semua field yang diperlukan');
-            }
+            document.getElementById('status').value = value;
+            document.getElementById('kuisForm').submit();
         }
-
         function clearForm() {
             if (confirm('Apakah Anda yakin ingin menghapus semua perubahan?')) {
                 const container = document.getElementById('pertanyaan-container');
