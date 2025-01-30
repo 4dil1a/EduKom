@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Kuis</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
 document.addEventListener('DOMContentLoaded', () => {
             const dropdown = document.querySelector('.dropdown');
@@ -154,14 +156,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function clearForm() {
-            if (confirm('Apakah Anda yakin ingin menghapus semua perubahan?')) {
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Semua perubahan akan dihapus!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
                 const container = document.getElementById('pertanyaan-container');
                 container.innerHTML = '';
                 jumlahSoal = 0;
                 document.getElementById('judul').value = '';
                 document.getElementById('status').value = '';
+                Swal.fire(
+                    'Terhapus!',
+                    'Formulir telah dikosongkan.',
+                    'success'
+                );
             }
-        }
+        });
+    }
+
     </script>
     <style>
         .dropdown-content {

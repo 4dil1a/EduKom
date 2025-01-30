@@ -8,8 +8,21 @@
     <script>
         // Function to submit form with selected status
         function submitFormWithStatus(value) {
-            document.getElementById('status').value = value;
-            document.getElementById('seminarForm').submit();
+            const form = document.getElementById('seminarForm');
+            const statusInput = document.getElementById('status');
+            const requiredFields = form.querySelectorAll('[required]');
+
+            statusInput.value = value;
+
+            let isValid = true;
+            requiredFields.forEach(field => {
+                if (!field.value) {
+                    isValid = false;
+                    field.classList.add('border-red-500');
+                } else {
+                    field.classList.remove('border-red-500');
+                }
+            });
         }
 
         // Function to clear the form

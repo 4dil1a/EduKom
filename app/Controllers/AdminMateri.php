@@ -34,7 +34,7 @@ class AdminMateri extends BaseController
             'gambar' => 'if_exist|is_image[gambar]|max_size[gambar,2048]|ext_in[gambar,png,jpg,jpeg]',
             'audio' => 'if_exist|ext_in[audio,mp3]|max_size[audio,5120]',
             'video' => 'if_exist|ext_in[video,mp4]|max_size[video,10240]',
-            'unduh_materi' => 'if_exist|ext_in[unduh_materi,pdf]|max_size[unduh_materi,5120]',
+            'unduh_materi' => 'required|ext_in[unduh_materi,pdf]|max_size[unduh_materi,5120]',
         ];
     
         if (!$this->validate($validationRules)) {
@@ -222,13 +222,12 @@ class AdminMateri extends BaseController
             return redirect()->to('/admin/materi')->with('success', 'Materi berhasil diperbarui');
         }
     }
-
     
 
     public function hapusMateri($id)
     {
         $referrer = $this->request->getGet('from') ?? 'materi';
-        
+
         $materi = $this->materiModel->find($id);
 
         if ($materi) {

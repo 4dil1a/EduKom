@@ -55,7 +55,11 @@ class AdminSeminar extends BaseController
         session()->setFlashdata('success', 'Seminar berhasil disimpan.');
         
         // Redirect based on referrer
-        return $this->redirectWithReferrer($referrer);
+        if ($referrer === 'dashboard_seminar') {
+            return redirect()->to('/admin/dashboard_seminar')->with('success', 'Seminar berhasil diperbarui');
+        } else {
+            return redirect()->to('/admin/seminar')->with('success', 'Seminar berhasil diperbarui');
+        }
     }
 
     public function editSeminar($seminar_id)

@@ -7,7 +7,6 @@ use CodeIgniter\Router\RouteCollection;
  */
 // Halaman landing sebagai default
 $routes->get('/', 'LandingPage::index');
-$routes->get('courses/detail/(:num)', 'CourseDetail::detail/$1');
 
 $routes->get('auth/googleLogin', 'Auth::googleLogin');
 $routes->get('auth/googleCallback', 'Auth::googleCallback');
@@ -98,10 +97,6 @@ $routes->get('admin/dashboard_pengguna', 'Admin::dashboardPengguna');
 $routes->get('admin/dashboard_kuis', 'Admin::dashboardKuis');
 
 
-
-
-
-
 $routes->get('kuis/mulai/(:num)', 'Kuis::mulaiKuis/$1', ['as' => 'mulai_kuis']);
 $routes->get('kuis/sesi', 'Kuis::sesiKuis', ['as' => 'sesi_kuis']);
 $routes->post('kuis/proses-jawaban', 'Kuis::prosesJawaban', ['as' => 'proses_jawaban']);
@@ -128,5 +123,36 @@ $routes->get('/auth/logout', 'Auth::logout');
 $routes->get('materi/video/(:num)', 'Materi::video/$1');
 
 $routes->post('user/updatePhoto', 'User::updatePhoto');
+//tambah
+$routes->post('user/updatePassword', 'User::updatePassword');
+$routes->post('user/deleteProfile', 'User::deleteProfile');
+$routes->get('detail_materi/(:num)', 'Materi::detail/$1');
+// app/Config/Routes.php
+
+// Rute lainnya
+$routes->get('/', 'Dashboard::index');
+$routes->get('/', 'Materi::index');
+$routes->get('/', 'Kuis::index');
+$routes->get('/', 'Seminar::index');
+
+
+$routes->get('detail_materi/(:segment)', 'Materi::detailMateri/$1');
+$routes->get('profile', 'Profile::index');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
