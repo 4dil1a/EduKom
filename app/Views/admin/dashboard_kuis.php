@@ -43,6 +43,8 @@
         table tr:hover {
             background-color: #f9fafb;
         }
+
+        
     </style>
 </head>
 <body class="bg-[#EEF5FF] h-screen flex">
@@ -54,6 +56,8 @@
 
     <!-- Main Content -->
     <div class="flex-1 pl-[242px] px-8 py-8 pt-[90px] overflow-auto pb-[50px]">
+        
+
         <!-- Header Section -->
         <h1 class="text-[24px] font-bold mb-5" style="color: #176B87;">Dashboard Kuis</h1>
 
@@ -157,9 +161,6 @@
                                     onclick="confirmDeletion('<?= site_url('admin/hapusKuis/' . $quiz['kuis_id'] . '?from=dashboard_kuis') ?>')">
                                     <i class="fas fa-trash"></i> Hapus
                                 </a>
-
-
-
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -173,32 +174,67 @@
     </div>
 
     <script>
-       function confirmDeletion(url) {
-    Swal.fire({
-        title: 'Apakah anda yakin ingin menghapus kuis?',
-        text: '',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#E5F6FF',
-        cancelButtonColor: '#DC2626',
-        confirmButtonText: '<span style="color: #176B87;">Ya</span>',
-        cancelButtonText: 'Batal',
-        customClass: {
-            confirmButton: 'py-2 px-4 rounded-md',
-            cancelButton: 'py-2 px-4 rounded-md text-white',
-            popup: 'rounded-md small-popup',
-            title: 'text-lg',
-            content: 'text-sm'
-        },
-        width: '350px',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.location.href = url;  // Directly use the passed URL
+        function confirmDeletion(url) {
+            Swal.fire({
+                title: 'Apakah anda yakin ingin menghapus kuis?',
+                text: '',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#E5F6FF',
+                cancelButtonColor: '#DC2626',
+                confirmButtonText: '<span style="color: #176B87;">Ya</span>',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    confirmButton: 'py-2 px-4 rounded-md',
+                    cancelButton: 'py-2 px-4 rounded-md text-white',
+                    popup: 'rounded-md small-popup',
+                    title: 'text-lg',
+                    content: 'text-sm'
+                },
+                width: '350px',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            });
         }
-    });
-}
 
-</script>
+        function showSuccessMessage(message) {
+            Swal.fire({
+                title: 'Berhasil!',
+                text: message,
+                icon: 'success',
+                confirmButtonColor: '#176B87',
+                customClass: {
+                    confirmButton: 'py-2 px-4 rounded-md'
+                }
+            });
+        }
+
+        // Function to show SweetAlert error message
+        function showErrorMessage(message) {
+            Swal.fire({
+                title: 'Error!',
+                text: message,
+                icon: 'error',
+                confirmButtonColor: '#DC2626',
+                customClass: {
+                    confirmButton: 'py-2 px-4 rounded-md text-white'
+                }
+            });
+        }
+
+        // Check for flash messages when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            <?php if(session()->getFlashdata('success')): ?>
+                showSuccessMessage('<?= session()->getFlashdata('success') ?>');
+            <?php endif; ?>
+
+            <?php if(session()->getFlashdata('error')): ?>
+                showErrorMessage('<?= session()->getFlashdata('error') ?>');
+            <?php endif; ?>
+        });
+    </script>
 
 </body>
 </html>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Data Seminar</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .btn-small {
@@ -98,18 +99,7 @@
     <div class="flex-1 pl-[242px] px-8 py-8 pt-[90px] overflow-auto pb-[50px]">
         <h1 class="text-[24px] font-bold mb-4" style="color: #176B87;">Data Seminar</h1>
         <div class="bg-white rounded-lg shadow p-6">
-            <!-- Flash Messages -->
-            <?php if (session()->getFlashdata('success')): ?>
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-                    <?= session()->getFlashdata('success') ?>
-                </div>
-            <?php endif; ?>
-
-            <?php if (session()->getFlashdata('error')): ?>
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-                    <?= session()->getFlashdata('error') ?>
-                </div>
-            <?php endif; ?>
+           
 
             <!-- Tombol Tambah Data -->
             <div class="mt-4">
@@ -171,9 +161,9 @@
                                    class="btn-small btn-edit">
                                     <i class="fas fa-edit"></i> <span>Edit</span>
                                 </a>
-                                <a href="<?= site_url('admin/hapusSeminar/' . $seminar['seminar_id'] . '?from=seminar') ?>" 
+                                <a href="#" 
                                    class="btn-small btn-delete"
-                                   onclick="return confirm('Yakin ingin menghapus seminar ini?')">
+                                   onclick="confirmDeletion('<?= site_url('admin/hapusSeminar/' . $seminar['seminar_id'] . '?from=seminar') ?>')">
                                     <i class="fas fa-trash"></i> <span>Hapus</span>
                                 </a>
                             </td>
@@ -208,6 +198,67 @@
     let currentPage = 1;
     let entriesPerPage = 10;
     let filteredData = [...seminarsData];
+
+    function showSuccessMessage(message) {
+            Swal.fire({
+                title: 'Berhasil!',
+                text: message,
+                icon: 'success',
+                confirmButtonColor: '#176B87',
+                customClass: {
+                    confirmButton: 'py-2 px-4 rounded-md'
+                }
+            });
+        }
+
+        // Function to show SweetAlert error message
+        function showErrorMessage(message) {
+            Swal.fire({
+                title: 'Error!',
+                text: message,
+                icon: 'error',
+                confirmButtonColor: '#DC2626',
+                customClass: {
+                    confirmButton: 'py-2 px-4 rounded-md text-white'
+                }
+            });
+        }
+
+        // Check for flash messages when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            <?php if(session()->getFlashdata('success')): ?>
+                showSuccessMessage('<?= session()->getFlashdata('success') ?>');
+            <?php endif; ?>
+
+            <?php if(session()->getFlashdata('error')): ?>
+                showErrorMessage('<?= session()->getFlashdata('error') ?>');
+            <?php endif; ?>
+        });
+
+    function confirmDeletion(url) {
+        Swal.fire({
+            title: 'Apakah anda yakin ingin menghapus seminar?',
+            text: '',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#E5F6FF',
+            cancelButtonColor: '#DC2626',
+            confirmButtonText: '<span style="color: #176B87;">Ya</span>',
+            cancelButtonText: 'Batal',
+            customClass: {
+                confirmButton: 'py-2 px-4 rounded-md',
+                cancelButton: 'py-2 px-4 rounded-md text-white',
+                popup: 'rounded-md small-popup',
+                title: 'text-lg',
+                content: 'text-sm'
+            },
+            width: '350px',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
 
     function filterSeminars() {
         const searchQuery = document.getElementById('search').value.toLowerCase();
@@ -254,9 +305,9 @@
                        class="btn-small btn-edit">
                         <i class="fas fa-edit"></i> <span>Edit</span>
                     </a>
-                    <a href="<?= site_url('admin/hapusSeminar/') ?>${seminar.seminar_id}?from=seminar" 
+                    <a href="#" 
                        class="btn-small btn-delete"
-                       onclick="return confirm('Yakin ingin menghapus seminar ini?')">
+                       onclick="confirmDeletion('<?= site_url('admin/hapusSeminar/') ?>${seminar.seminar_id}?from=seminar')">
                         <i class="fas fa-trash"></i> <span>Hapus</span>
                     </a>
                 </td>

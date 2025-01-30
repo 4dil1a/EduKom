@@ -6,6 +6,7 @@
     <title>Admin Data Kuis</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .btn-small {
             width: 80px;
@@ -98,18 +99,7 @@
     <div class="flex-1 pl-[242px] px-8 py-8 pt-[90px] overflow-auto pb-[50px]">
         <h1 class="text-[24px] font-bold mb-4" style="color: #176B87;">Data Kuis</h1>
         <div class="bg-white rounded-lg shadow p-6">
-            <!-- Flash Messages -->
-            <?php if (session()->getFlashdata('success')): ?>
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-                    <?= session()->getFlashdata('success') ?>
-                </div>
-            <?php endif; ?>
-
-            <?php if (session()->getFlashdata('error')): ?>
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-                    <?= session()->getFlashdata('error') ?>
-                </div>
-            <?php endif; ?>
+            
 
             <!-- Tombol Tambah Data -->
             <div class="mt-4">
@@ -170,9 +160,9 @@
                                        class="btn-small btn-edit inline-flex items-center justify-center">
                                         <i class="fas fa-edit"></i> <span>Edit</span>
                                     </a>
-                                    <a href="<?= site_url('admin/hapusKuis/' . $quiz['kuis_id'] . '?from=kuis') ?>" 
+                                    <a href="#" 
                                        class="btn-small btn-delete inline-flex items-center justify-center"
-                                       onclick="return confirm('Yakin ingin menghapus kuis ini?')">
+                                       onclick="confirmDeletion('<?= site_url('admin/hapusKuis/' . $quiz['kuis_id'] . '?from=kuis') ?>')">
                                         <i class="fas fa-trash"></i> <span>Hapus</span>
                                     </a>
                                 </div>
@@ -251,9 +241,9 @@
                        class="btn-small btn-edit">
                         <i class="fas fa-edit"></i> <span>Edit</span>
                     </a>
-                    <a href="<?= site_url('admin/hapusKuis/') ?>${quiz.kuis_id}?from=kuis" 
+                    <a href="#" 
                        class="btn-small btn-delete"
-                       onclick="return confirm('Yakin ingin menghapus kuis ini?')">
+                       onclick="confirmDeletion('<?= site_url('admin/hapusKuis/') ?>${quiz.kuis_id}?from=kuis')">
                         <i class="fas fa-trash"></i> <span>Hapus</span>
                     </a>
                 </td>
@@ -273,6 +263,44 @@
 
         nextBtn.disabled = endIndex >= data.length;
         nextBtn.classList.toggle('opacity-50', endIndex >= data.length);
+    }
+
+    <!-- Flash Messages -->
+            <?php if (session()->getFlashdata('success')): ?>
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+                    <?= session()->getFlashdata('success') ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (session()->getFlashdata('error')): ?>
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                    <?= session()->getFlashdata('error') ?>
+                </div>
+            <?php endif; ?>
+
+    function confirmDeletion(url) {
+        Swal.fire({
+            title: 'Apakah anda yakin ingin menghapus kuis?',
+            text: '',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#E5F6FF',
+            cancelButtonColor: '#DC2626',
+            confirmButtonText: '<span style="color: #176B87;">Ya</span>',
+            cancelButtonText: 'Batal',
+            customClass: {
+                confirmButton: 'py-2 px-4 rounded-md',
+                cancelButton: 'py-2 px-4 rounded-md text-white',
+                popup: 'rounded-md small-popup',
+                title: 'text-lg',
+                content: 'text-sm'
+            },
+            width: '350px',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
     }
 
     function changePage(direction) {

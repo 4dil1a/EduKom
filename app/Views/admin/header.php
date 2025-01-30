@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduKom Header</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         @font-face {
             font-family: 'ADLaM Display';
@@ -57,15 +58,41 @@
     </a>
     <nav>
         <div class="mt-auto">
-            <a href="<?= site_url('/auth/logout'); ?>" 
+            <a href="#" 
                 class="btn-logout" 
-                onclick="return confirm('Apakah Anda yakin ingin keluar?');">
+                onclick="confirmLogout('<?= site_url('/auth/logout'); ?>')">
                 <i class="fas fa-sign-out-alt" style="font-size: 24px; padding-right: 10px"></i>
             </a>
-
         </div>
     </nav>
 </header>
+
+<script>
+function confirmLogout(url) {
+    Swal.fire({
+        title: 'Apakah anda yakin ingin keluar?',
+        text: '',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#E5F6FF',
+        cancelButtonColor: '#DC2626',
+        confirmButtonText: '<span style="color: #176B87;">Ya</span>',
+        cancelButtonText: 'Batal',
+        customClass: {
+            confirmButton: 'py-2 px-4 rounded-md',
+            cancelButton: 'py-2 px-4 rounded-md text-white',
+            popup: 'rounded-md small-popup',
+            title: 'text-lg',
+            content: 'text-sm'
+        },
+        width: '350px',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = url;
+        }
+    });
+}
+</script>
 
 </body>
 </html>
